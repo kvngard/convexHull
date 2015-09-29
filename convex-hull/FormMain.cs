@@ -125,6 +125,9 @@ namespace _2_convex_hull
             InitializeComponent();
             pictureBoxView.Image = new Bitmap(pictureBoxView.Width, pictureBoxView.Height);
             m_g = Graphics.FromImage(pictureBoxView.Image);
+            m_g.TranslateTransform(0, pictureBoxView.Height);
+            m_g.ScaleTransform(1, -1);
+            pictureBoxView.Image.RotateFlip(RotateFlipType.Rotate180FlipX);
             pointGenerator = new UniformPointGenerator();
             radioUniform.Checked = true;    //start with this as the default
             m_pointList = new List<PointF>();
@@ -170,13 +173,14 @@ namespace _2_convex_hull
         {
             m_g.Clear(Color.White);
             m_g.Flush();
-            
+
             Pen pointColor = new Pen(Color.FromArgb(0, 0, 0));
             foreach (PointF point in m_pointList)
             {
                 m_g.DrawEllipse(pointColor, new RectangleF(point, new Size(2, 2)));
                 
             }
+            m_g.DrawEllipse(pointColor, new RectangleF(new PointF(0, 0), new Size(4, 4)));
             pictureBoxView.Refresh(); // show our results
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using _2_convex_hull;
 
 namespace _1_convex_hull
 {
@@ -32,9 +33,9 @@ namespace _1_convex_hull
 
         public Hull(List<System.Drawing.PointF> pointList)
         {
-            this.Order(pointList);
             leftMost = pointList[0];
             rightMost = pointList.Last();
+            this.Order(leftMost, pointList);
             vertices = new List<PointF>(pointList);
         }
 
@@ -48,16 +49,20 @@ namespace _1_convex_hull
             return vertices.ElementAt(index);
         }
 
+        public static int mod(int x, int m)
+        {
+            return (x % m + m) % m;
+        }
+
         public static double findSlope(PointF a, PointF b)
         {
             return (b.Y - a.Y) / (b.X - a.X);
         }
 
-        public void Order(List<System.Drawing.PointF> pointList)
+        public void Order(PointF leftMost, List<System.Drawing.PointF> pointList)
         {
             Dictionary<double, PointF> slopes = new Dictionary<double, PointF>();
-            PointF leftMost = pointList[0];
-            pointList.RemoveAt(0);
+            pointList.Remove(leftMost);
 
             foreach (PointF a in pointList)
             {
@@ -96,7 +101,8 @@ namespace _1_convex_hull
                     j++;
                 }
             }
-            
+
+            combined.Order(combined.leftMost, combined.vertices);
             return combined;
         }
 
@@ -108,37 +114,17 @@ namespace _1_convex_hull
 
             int i = A.getIndex(a);
             int j = B.getIndex(b);
-            bool peek = false;
+            bool iterateA = false;
             bool potential = false;
             bool found = false;
 
             while (!found)
             {
-                if (!peek)
-                {
-                    b = B.vertexAt(Math.Abs(j - 1) % B.vertices.Count);
-                    Edge next = new Edge(currentEdge.a, b);
-
-                    if (next.slope > currentEdge.slope)
-                    {
-                        potential = false;
-                        currentEdge = next;
-                        j--;
-                    }
-                    else
-                    {
-                        peek = true;
-
-                        if (potential)
-                            found = true;
-                        else
-                            potential = true;
-                    }
-                }
-                else
+                if (iterateA)
                 {
                     a = A.vertexAt((i + 1) % A.vertices.Count);
                     Edge next = new Edge(a, currentEdge.b);
+                    //ConvexHullSolver.drawLine(next);
 
                     if (next.slope < currentEdge.slope)
                     {
@@ -148,7 +134,29 @@ namespace _1_convex_hull
                     }
                     else
                     {
-                        peek = false;
+                        iterateA = false;
+
+                        if (potential)
+                            found = true;
+                        else
+                            potential = true;
+                    }
+                }
+                else
+                {
+                    b = B.vertexAt(mod(j-1,B.vertices.Count));
+                    Edge next = new Edge(currentEdge.a, b);
+                    //ConvexHullSolver.drawLine(next);
+
+                    if (next.slope > currentEdge.slope)
+                    {
+                        potential = false;
+                        currentEdge = next;
+                        j--;
+                    }
+                    else
+                    {
+                        iterateA = true;
 
                         if (potential)
                             found = true;
@@ -168,37 +176,17 @@ namespace _1_convex_hull
 
             int i = A.getIndex(a);
             int j = B.getIndex(b);
-            bool peek = false;
+            bool peek = true;
             bool potential = false;
             bool found = false;
 
             while (!found)
             {
-                if (!peek)
+                if (peek)
                 {
-                    b = B.vertexAt((j + 1) % B.vertices.Count);
-                    Edge next = new Edge(currentEdge.a, b);
-
-                    if (next.slope < currentEdge.slope)
-                    {
-                        potential = false;
-                        currentEdge = next;
-                        j++;
-                    }
-                    else
-                    {
-                        peek = true;
-
-                        if (potential)
-                            found = true;
-                        else
-                            potential = true;
-                    }
-                }
-                else
-                {
-                    a = A.vertexAt(Math.Abs(i - 1) % A.vertices.Count);
+                    a = A.vertexAt(mod(i - 1, A.vertices.Count));
                     Edge next = new Edge(a, currentEdge.b);
+                    //ConvexHullSolver.drawLine(next, true);
 
                     if (next.slope > currentEdge.slope)
                     {
@@ -209,6 +197,28 @@ namespace _1_convex_hull
                     else
                     {
                         peek = false;
+
+                        if (potential)
+                            found = true;
+                        else
+                            potential = true;
+                    }
+                }
+                else
+                {
+                    b = B.vertexAt((j + 1) % B.vertices.Count);
+                    Edge next = new Edge(currentEdge.a, b);
+                    //ConvexHullSolver.drawLine(next, true);
+
+                    if (next.slope < currentEdge.slope)
+                    {
+                        potential = false;
+                        currentEdge = next;
+                        j++;
+                    }
+                    else
+                    {
+                        peek = true;
 
                         if (potential)
                             found = true;
