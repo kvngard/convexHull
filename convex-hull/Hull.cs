@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _2_convex_hull;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace _1_convex_hull
         public PointF leftMost { get; set; }
         public PointF rightMost { get; set; }
         public List<PointF> vertices { get; set; }
+
+        public static ConvexHullSolver chs;
 
         public struct Edge
         {
@@ -25,13 +28,15 @@ namespace _1_convex_hull
                 slope = findSlope(a, b);
             }
         }
-        public Hull()
+        public Hull(ConvexHullSolver CHS)
         {
+            chs = CHS;
             vertices = new List<PointF>();
         }
 
-        public Hull(List<System.Drawing.PointF> pointList)
+        public Hull(List<System.Drawing.PointF> pointList, ConvexHullSolver CHS)
         {
+            chs = CHS;
             this.Order(pointList);
             leftMost = pointList[0];
             rightMost = pointList.Last();
@@ -74,7 +79,7 @@ namespace _1_convex_hull
 
         public static Hull Combine(Hull A, Hull B)
         {
-            Hull combined = new Hull();
+            Hull combined = new Hull(chs);
             Edge upper = findUpper(A, B);
             Edge lower = findLower(A, B);
 
@@ -111,12 +116,17 @@ namespace _1_convex_hull
             bool peek = false;
             bool potential = false;
             bool found = false;
+            Pen p = new Pen(Color.Cyan);
+            Pen r = new Pen(Color.Coral);
 
             while (!found)
             {
                 if (!peek)
                 {
                     b = B.vertexAt(Math.Abs(j - 1) % B.vertices.Count);
+                    chs.g.DrawLine(p, currentEdge.a, b);
+                    chs.Refresh();
+                    chs.Pause(1000);
                     Edge next = new Edge(currentEdge.a, b);
 
                     if (next.slope > currentEdge.slope)
@@ -138,6 +148,9 @@ namespace _1_convex_hull
                 else
                 {
                     a = A.vertexAt((i + 1) % A.vertices.Count);
+                    chs.g.DrawLine(r, a, currentEdge.b);
+                    chs.Refresh();
+                    chs.Pause(1000);
                     Edge next = new Edge(a, currentEdge.b);
 
                     if (next.slope < currentEdge.slope)
@@ -171,12 +184,17 @@ namespace _1_convex_hull
             bool peek = false;
             bool potential = false;
             bool found = false;
+            Pen p = new Pen(Color.Blue);
+            Pen r = new Pen(Color.Red);
 
             while (!found)
             {
                 if (!peek)
                 {
                     b = B.vertexAt((j + 1) % B.vertices.Count);
+                    chs.g.DrawLine(p, currentEdge.a, b);
+                    chs.Refresh();
+                    chs.Pause(1000);
                     Edge next = new Edge(currentEdge.a, b);
 
                     if (next.slope < currentEdge.slope)
@@ -198,6 +216,9 @@ namespace _1_convex_hull
                 else
                 {
                     a = A.vertexAt(Math.Abs(i - 1) % A.vertices.Count);
+                    chs.g.DrawLine(r, a, currentEdge.b);
+                    chs.Refresh();
+                    chs.Pause(1000);
                     Edge next = new Edge(a, currentEdge.b);
 
                     if (next.slope > currentEdge.slope)

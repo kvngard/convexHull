@@ -10,7 +10,7 @@ namespace _2_convex_hull
 {
     class ConvexHullSolver
     {
-        System.Drawing.Graphics g;
+        public System.Drawing.Graphics g;
         System.Windows.Forms.PictureBox pictureBoxView;
 
         public ConvexHullSolver(System.Drawing.Graphics g, System.Windows.Forms.PictureBox pictureBoxView)
@@ -37,14 +37,24 @@ namespace _2_convex_hull
             Debug.WriteLine(pointList.Count);
             if (pointList.Count < 4)
             {
-                return new Hull(pointList);
+                return new Hull(pointList, this);
             }
             else
             { 
+                Pen p = new Pen(Brushes.Black);
                 Hull left = Solve(pointList.Take(pointList.Count / 2).ToList());
                 Hull right = Solve(pointList.Skip(pointList.Count / 2).ToList());
 
-                return Hull.Combine(left, right);
+                g.DrawPolygon(p, left.vertices.ToArray());
+                g.DrawPolygon(p, right.vertices.ToArray());
+                pictureBoxView.Refresh();
+
+                Hull combined = Hull.Combine(left, right);
+
+                g.DrawPolygon(p, combined.vertices.ToArray());
+                pictureBoxView.Refresh();
+
+                return combined;
             }
         }
 
