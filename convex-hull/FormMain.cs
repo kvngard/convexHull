@@ -204,7 +204,7 @@ namespace _2_convex_hull
             Stopwatch timer = new Stopwatch();
             timer.Start();
                 ConvexHullSolver convexHullSolver = new ConvexHullSolver(m_g, pictureBoxView);
-                convexHullSolver.Solve(m_pointList);
+                ConvexHullSolver.drawPolygon(convexHullSolver.Solve(m_pointList));
                 pictureBoxView.Refresh();
             timer.Stop();
             statusLabel.Text = "Done.  Time taken: " + timer.Elapsed;

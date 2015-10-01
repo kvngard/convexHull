@@ -26,19 +26,15 @@ namespace _2_convex_hull
                 p = new Pen(Color.Blue);
             else
                 p = new Pen(Color.Coral);
-
             g.DrawLine(p, e.a, e.b);
             Refresh();
-            Pause(100);
         }
 
         public static void drawPolygon(Hull h)
         {
             Pen p = new Pen(Color.Black);
-
             g.DrawPolygon(p, h.vertices.ToArray());
             Refresh();
-            Pause(100);
         }
 
         static public void Refresh()
@@ -56,28 +52,27 @@ namespace _2_convex_hull
 
         public Hull Solve(List<System.Drawing.PointF> pointList)
         {
-            Debug.WriteLine(pointList.Count);
+            //Our main recursive method.
+            //Time Complexity: O(n log(n))
+            //Space Complexity: O(n)
+
+            //The base-case where we have fewer than 3 points and can confidently join them without intersection.
             if (pointList.Count < 4)
             {
+                //Time: O(1), Space O(1), given that we'll never be working with more than 3 vertices.
                 return new Hull(pointList);
             }
             else
-            { 
+            {
+                //Recurse down the tree to the base-case.
+                //Time: O(log(n))
                 Hull left = Solve(pointList.Take(pointList.Count / 2).ToList());
                 Hull right = Solve(pointList.Skip(pointList.Count / 2).ToList());
 
-                ConvexHullSolver.drawPolygon(left);
-                ConvexHullSolver.drawPolygon(right);
-
+                //Time: O(n), Space O(n)
                 Hull combo = Hull.Combine(left, right);
-                drawPolygon(combo);
                 return combo;
             }
-        }
-
-        public double findSlope(PointF a, PointF b)
-        {
-            return (a.X - b.X) / (a.Y - b.Y);
         }
     }
 }
