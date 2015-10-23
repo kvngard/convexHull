@@ -99,7 +99,7 @@ namespace _1_convex_hull
             pointList.Insert(0, leftMost);
         }
 
-        public static Hull Combine(Hull A, Hull B)
+        public static Hull Combine(Hull Left, Hull Right)
         {
             //Time Complexity: O(n + 2n + m) = O(n)
             //Space Complexity: O(3n + m) = O(n)
@@ -107,16 +107,16 @@ namespace _1_convex_hull
             Hull combined = new Hull();
             //Find the upper and lower tangent edges.
             //Time: O(2n), Space: O(n)
-            Edge upper = findUpper(A, B);
-            Edge lower = findLower(A, B);
+            Edge upper = findUpper(Left, Right);
+            Edge lower = findLower(Left, Right);
 
             //Set the rightmost and leftmost points.
-            combined.leftMost = A.leftMost;
-            combined.rightMost = B.rightMost;
+            combined.leftMost = Left.leftMost;
+            combined.rightMost = Right.rightMost;
 
             //Find the point at which to start iterating on each hull.
-            int i = B.vertices.IndexOf(lower.b);
-            int j = A.vertices.IndexOf(upper.a);
+            int i = Right.vertices.IndexOf(lower.b);
+            int j = Left.vertices.IndexOf(upper.a);
 
             //Start at the lower b point and iterate around until you arrive at the lower a point.
             while (!combined.vertices.Contains(lower.a))
@@ -124,13 +124,13 @@ namespace _1_convex_hull
                 //If you have not arrive at upper b, add points from hull B into the combined hull.
                 if (!combined.vertices.Contains(upper.b))
                 {
-                    combined.vertices.Add(B.vertices.ElementAt(i % B.vertices.Count));
+                    combined.vertices.Add(Right.vertices.ElementAt(i % Right.vertices.Count));
                     i++;
                 }
                 //If you have arrived at upper b, push all of the points from hull A into the combined hull from upper a to lower a.
                 else
                 {
-                    combined.vertices.Add(A.vertices.ElementAt(j % A.vertices.Count));
+                    combined.vertices.Add(Left.vertices.ElementAt(j % Left.vertices.Count));
                     j++;
                 }
             }
@@ -140,40 +140,40 @@ namespace _1_convex_hull
         }
 
         //These two methods are designed to find the upper and lower tangents of two hulls.
-        //They're essentially mirror methods, with the findUpper iterating up A and down B
+        //They're essentially mirror methods, with the findUpper iterating up left and down right
         //and vice-versa for findLower.
-        private static Edge findUpper(Hull A, Hull B)
+        private static Edge findUpper(Hull Left, Hull Right)
         {
             //Time Complexity: ~O(n/2) = O(n)
             //Space Complexity: ~O(2n/2) = O(n)
 
             //Define the starting edge as the edge between the rightmost and leftmost points of the two hulls.
-            Edge currentEdge = new Edge(A.rightMost, B.leftMost);
+            Edge currentEdge = new Edge(Left.rightMost, Right.leftMost);
             //These values, along with the getNext and getPrev functions, act as our system for iterating over a hull.
-            int i = A.vertices.IndexOf(A.rightMost);
-            int j = B.vertices.IndexOf(B.leftMost);
+            int i = Left.vertices.IndexOf(Left.rightMost);
+            int j = Right.vertices.IndexOf(Right.leftMost);
 
             while(true)
             {
 
-                Edge nextA = new Edge(A.getNextVertex(i), currentEdge.b);
-                Edge nextB = new Edge(currentEdge.a, B.getPrevVertex(j));
+                Edge nextLeft = new Edge(Left.getNextVertex(i), currentEdge.b);
+                Edge nextRight = new Edge(currentEdge.a, Right.getPrevVertex(j));
 
                 //Check for conditions that indicate that we've found the upper tangent.
-                if (nextA.slope > currentEdge.slope && nextB.slope < currentEdge.slope)
+                if (nextLeft.slope > currentEdge.slope && nextRight.slope < currentEdge.slope)
                 {
                     return currentEdge;
                 }
 
                 //Check to see in which direction to iterate and then advance the currentEdge.
-                if (nextA.slope < currentEdge.slope)
+                if (nextLeft.slope < currentEdge.slope)
                 {
-                    currentEdge = nextA;
+                    currentEdge = nextLeft;
                     i++;
                 }
-                else if (nextB.slope > currentEdge.slope)
+                else if (nextRight.slope > currentEdge.slope)
                 {
-                    currentEdge = nextB;
+                    currentEdge = nextRight;
                     j--;
                 }
             }

@@ -70,8 +70,8 @@ namespace _2_convex_hull
                 Hull right = Solve(pointList.Skip(pointList.Count / 2).ToList());
 
                 //Time: O(n), Space O(n)
-                Hull combo = Hull.Combine(left, right);
-                return combo;
+                Hull combinedHull = Hull.Combine(left, right);
+                return combinedHull;
             }
         }
     }
